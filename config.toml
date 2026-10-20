@@ -56,6 +56,6 @@ destinations = [
 [[flight_masters]]
 name = "Dungar Longdrink (Stormwind)"
 map = 0
-x = -8835.8
-y = 490.1
+x = -8835.3
+y = 490.5
 routes = { "Sentinel Hill" = 1 }
