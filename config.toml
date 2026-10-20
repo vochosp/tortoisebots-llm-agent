@@ -1,0 +1,61 @@
+# Settings for one mission run. Change the model or the bot here, not in code.
+
+bot = "John"
+
+[mission]
+goal = "Deliver a fragile package from Stormwind to Booty Bay."
+time_limit_min = 45
+facts = [
+    "You are a level 20 human with no mount.",
+    "Dying fails the mission.",
+    "Known flight paths: Stormwind, Sentinel Hill (Westfall). Darkshire and Booty Bay are not discovered.",
+    "A flight can only start while you stand next to a flight master.",
+]
+# Booty Bay, used to detect success (map 0, approximate centre of the town).
+target = { map = 0, x = -14354.0, y = 425.0, radius = 150.0 }
+
+[ollama]
+url = "http://127.0.0.1:11434"
+model = "qwen3.5:4b"
+num_ctx = 4096
+temperature = 0
+seed = 42
+
+[soap]
+url = "http://127.0.0.1:7878/"
+# The account and password are read from the environment variables
+# TB_SOAP_USER and TB_SOAP_PASS, or asked for at start. Never put them here.
+
+[telemetry]
+# AiPlayerbot.ObservabilityPort in aiplayerbot.conf.
+port = 9195
+
+[agent]
+# Ask the model again when the bot has not moved for this long.
+idle_seconds = 20
+# Never ask the model more often than this.
+min_seconds_between_decisions = 10
+max_decisions = 30
+
+[travel]
+# Places the model may send the bot to with "travel". They are passed to the
+# bot as "go travel <place>".
+destinations = [
+    "Stormwind",
+    "Elwynn Forest",
+    "Westfall",
+    "Redridge Mountains",
+    "Duskwood",
+    "Stranglethorn Vale",
+    "Booty Bay",
+]
+
+# Flight masters the bot can use. The bot's "taxi <n>" takes the route number
+# from its own "taxi ?" list, and the agent cannot read the bot's replies, so
+# the numbers come from an in-game "taxi ?" check. Positions from .gps.
+[[flight_masters]]
+name = "Dungar Longdrink (Stormwind)"
+map = 0
+x = -8835.8
+y = 490.1
+routes = { "Sentinel Hill" = 1 }
