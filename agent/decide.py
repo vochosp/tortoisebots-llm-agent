@@ -59,7 +59,7 @@ Time limit: {cfg["mission"]["time_limit_min"]} minutes.
 Answer with exactly one command as JSON:
 - travel: walk to a place. target is one of: {places}
 - taxi: fly from the flight master next to you. target is one of the flights listed for that flight master.
-- wait: do nothing for a while. target is the number of seconds (10 to 120).
+- wait: do nothing for a while. target is the number of seconds as plain digits, for example "30" (10 to 120).
 Keep the reason to one short sentence."""
 
 
