@@ -5,6 +5,20 @@ import time
 import urllib.request
 
 
+def load(cfg):
+    """Loads the model into the GPU, so the first decision is not slowed by it."""
+    body = {"model": cfg["model"], "keep_alive": "30m"}
+    request = urllib.request.Request(
+        cfg["url"] + "/api/generate",
+        data=json.dumps(body).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
+    )
+    start = time.perf_counter()
+    with urllib.request.urlopen(request, timeout=600) as response:
+        response.read()
+    return round(time.perf_counter() - start, 1)
+
+
 def chat(cfg, system, user, schema):
     """Returns (answer dict or None, raw text, timing dict)."""
     body = {

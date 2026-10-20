@@ -1,6 +1,7 @@
 """Sends server console commands over the mangosd SOAP interface."""
 
 import base64
+import html
 import re
 import time
 import urllib.error
@@ -36,5 +37,5 @@ class Soap:
         ms = round((time.perf_counter() - start) * 1000)
         match = re.search(r"<result>(.*?)</result>|<faultstring>(.*?)</faultstring>", text, re.S)
         if match:
-            text = (match.group(1) or match.group(2) or "").strip()
+            text = html.unescape(match.group(1) or match.group(2) or "").strip()
         return ok, text, ms

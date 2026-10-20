@@ -8,6 +8,7 @@ checks its answer and sends the command to the game with .bot order.
 
 import argparse
 import getpass
+import math
 import os
 import time
 import tomllib
@@ -31,6 +32,19 @@ def wait_for_bot(telemetry, seconds=15):
     return telemetry.state is not None
 
 
+def watch(telemetry, log, seconds=30):
+    """After --once: shows for a while whether the bot acts on the order."""
+    start_state = telemetry.state
+    for _ in range(seconds // 5):
+        time.sleep(5)
+        state = telemetry.state
+        moved = math.hypot(state["x"] - start_state["x"], state["y"] - start_state["y"])
+        log.write("state", **{k: state.get(k) for k in
+                  ("zone", "x", "y", "state", "travel_to", "travel_dist", "last_action")})
+        print(f"           moved {moved:.0f} yards, state {state['state']}, "
+              f"travelling to '{state['travel_to']}' ({state['travel_dist']} yards left)")
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", default="config.toml")
@@ -50,9 +64,13 @@ def main():
         print(f"No telemetry for {bot}. Is AiPlayerbot.Observability = 1 and the bot online?")
         return
 
+    print(f"Loading {cfg['ollama']['model']} ...")
+    load_s = llm.load(cfg["ollama"])
+    print(f"Model ready after {load_s} s.")
+
     log = RunLog("runs", f"{bot}_{cfg['ollama']['model'].replace(':', '-')}")
     log.write("run_start", bot=bot, model=cfg["ollama"]["model"], strategy="direct",
-              dry_run=args.dry_run, config=cfg)
+              dry_run=args.dry_run, model_load_s=load_s, config=cfg)
     print(f"Run log: {log.path}")
 
     system = decide.system_prompt(cfg)
@@ -134,6 +152,7 @@ def main():
         last_decision = still_since = time.time()
         trigger = None
         if args.once:
+            watch(telemetry, log)
             result = "stopped: --once"
 
     minutes = (time.time() - start) / 60
