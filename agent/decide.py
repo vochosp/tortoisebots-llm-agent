@@ -17,6 +17,11 @@ ZONES = {
     1537: "Ironforge",
 }
 
+# Sent before every travel or taxi order. Follow and stay would hold the bot in
+# place, and its own travel strategies would pick other targets. "go travel"
+# adds "travel once" back for the new trip.
+CLEAR = "nc -follow,-stay,-travel,-travel once"
+
 # The target is a free string, not an enum of valid places, so that wrong
 # places stay visible as invalid commands in the results.
 SCHEMA = {
@@ -108,8 +113,7 @@ def validate(cfg, answer, state):
     if command == "travel":
         for place in cfg["travel"]["destinations"]:
             if place.lower() == target.lower():
-                # Follow and stay would hold the bot in place, so clear them first.
-                return ["nc -follow,-stay", f"go travel {place}"], None
+                return [CLEAR, f"go travel {place}"], None
         return None, f"unknown travel destination '{target}'"
 
     if command == "taxi":
@@ -118,7 +122,7 @@ def validate(cfg, answer, state):
             return None, "no flight master next to the bot"
         for name, number in master["routes"].items():
             if name.lower() == target.lower():
-                return [f"taxi {number}"], None
+                return [CLEAR, f"taxi {number}"], None
         return None, f"no flight to '{target}' from {master['name']}"
 
     if command == "wait":
